@@ -1,104 +1,129 @@
 package praktikum;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertSame;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.mock;
 
+@RunWith(MockitoJUnitRunner.class)
 public class BurgerTest {
 
-    @Test
-    public void emptyBurger_shouldHaveZeroIngredients() {
-        Burger burger = new Burger();
-        assertEquals(0, burger.ingredients.size());
+    private Burger burger;
+
+    @Mock
+    private Bun bunMock;
+
+    @Mock
+    private Ingredient ingredientMock1;
+
+    @Mock
+    private Ingredient ingredientMock2;
+
+    @Before
+    public void setUp() {
+        burger = new Burger();
     }
 
+
+
     @Test
-    public void setBuns_shouldAssignBun() {
-        Bun bun = new Bun("black bun", 100.0f);
-        Burger burger = new Burger();
-
-        burger.setBuns(bun);
-
-        assertEquals("black bun", burger.bun.getName());
-        assertEquals(100.0f, burger.bun.getPrice(), 0.001f);
+    public void setBunsSavesBunInField() {
+        burger.setBuns(bunMock);
+        assertSame(bunMock, burger.bun);
     }
 
+
+
     @Test
-    public void addIngredient_shouldAddToList() {
-        Burger burger = new Burger();
-        burger.setBuns(new Bun("default", 50.0f));
-
-        Ingredient ingredient = new Ingredient(IngredientType.SAUCE, "chili", 15.0f);
-        burger.addIngredient(ingredient);
-
+    public void addIngredientIncreasesIngredientsSizeByOne() {
+        burger.setBuns(bunMock);
+        burger.addIngredient(ingredientMock1);
         assertEquals(1, burger.ingredients.size());
-        assertEquals("chili", burger.ingredients.get(0).getName());
     }
 
+
+
     @Test
-    public void removeIngredient_shouldRemoveFromList() {
-        Burger burger = new Burger();
-        burger.setBuns(new Bun("default", 50.0f));
-        Ingredient ingredient = new Ingredient(IngredientType.FILLING, "cheese", 40.0f);
-        burger.addIngredient(ingredient);
+    public void removeIngredientDecreasesIngredientsSizeByOne() {
+        burger.setBuns(bunMock);
+        burger.addIngredient(ingredientMock1);
+        burger.addIngredient(ingredientMock2);
 
         burger.removeIngredient(0);
 
-        assertEquals(0, burger.ingredients.size());
+        assertEquals(1, burger.ingredients.size());
     }
 
-    @Test
-    public void moveIngredient_shouldChangeOrder() {
-        Burger burger = new Burger();
-        burger.setBuns(new Bun("default", 50.0f));
 
-        Ingredient first = new Ingredient(IngredientType.SAUCE, "bbq", 10.0f);
-        Ingredient second = new Ingredient(IngredientType.FILLING, "beef", 80.0f);
+
+    @Test
+    public void moveIngredientChangesIngredientOrder() {
+        burger.setBuns(bunMock);
+
+        Ingredient first = mock(Ingredient.class);
+        Ingredient second = mock(Ingredient.class);
+
         burger.addIngredient(first);
         burger.addIngredient(second);
 
         burger.moveIngredient(0, 1);
 
-        assertEquals("bbq", burger.ingredients.get(1).getName());
-        assertEquals("beef", burger.ingredients.get(0).getName());
+        assertSame(first, burger.ingredients.get(1));
     }
 
-    @Test
-    public void getPrice_shouldSumBunsAndIngredients() {
-        Burger burger = new Burger();
-        burger.setBuns(new Bun("white bun", 60.0f));
-        burger.addIngredient(new Ingredient(IngredientType.SAUCE, "garlic", 20.0f));
-        burger.addIngredient(new Ingredient(IngredientType.FILLING, "cutlet", 100.0f));
 
-        float expected = 2 * 60.0f + 20.0f + 100.0f;
-        assertEquals(expected, burger.getPrice(), 0.001f);
+
+    @Test
+    public void getPriceReturnsSumOfBunAndIngredients() {
+        when(bunMock.getPrice()).thenReturn(100.0f);
+        when(ingredientMock1.getPrice()).thenReturn(20.0f);
+        when(ingredientMock2.getPrice()).thenReturn(30.0f);
+
+        burger.setBuns(bunMock);
+        burger.addIngredient(ingredientMock1);
+        burger.addIngredient(ingredientMock2);
+
+        float expectedPrice = 2 * 100.0f + 20.0f + 30.0f;
+
+        assertEquals(expectedPrice, burger.getPrice(), 0.0001f);
     }
 
-    @Test
-    public void getPrice_withoutIngredients_shouldBeDoubleBunPrice() {
-        Burger burger = new Burger();
-        burger.setBuns(new Bun("black bun", 100.0f));
 
-        float expected = 2 * 100.0f;
-        assertEquals(expected, burger.getPrice(), 0.001f);
-    }
 
     @Test
-    public void getReceipt_shouldContainBunsIngredientsAndPrice() {
-        Burger burger = new Burger();
-        burger.setBuns(new Bun("black bun", 100.0f));
-        burger.addIngredient(new Ingredient(IngredientType.SAUCE, "spicy", 30.0f));
-        burger.addIngredient(new Ingredient(IngredientType.FILLING, "cheese", 40.0f));
+    public void getReceiptReturnsFormattedReceiptWithBunIngredientsAndPrice() {
+        when(bunMock.getName()).thenReturn("test bun");
+        when(bunMock.getPrice()).thenReturn(100.0f);
 
-        String receipt = burger.getReceipt();
+        when(ingredientMock1.getType()).thenReturn(IngredientType.SAUCE);
+        when(ingredientMock1.getName()).thenReturn("ketchup");
+        when(ingredientMock1.getPrice()).thenReturn(10.0f);
 
-        assertTrue(receipt.contains("(==== black bun ====)"));
-        assertTrue(receipt.contains("= sauce spicy ="));
-        assertTrue(receipt.contains("= filling cheese ="));
-        assertTrue(receipt.contains("(==== black bun ====)"));
+        when(ingredientMock2.getType()).thenReturn(IngredientType.FILLING);
+        when(ingredientMock2.getName()).thenReturn("cutlet");
+        when(ingredientMock2.getPrice()).thenReturn(200.0f);
 
-        String expectedPriceLine = String.format("Price: %f", burger.getPrice());
-        assertTrue(receipt.contains(expectedPriceLine));
+        burger.setBuns(bunMock);
+        burger.addIngredient(ingredientMock1);
+        burger.addIngredient(ingredientMock2);
+
+        float expectedPrice = 2 * 100.0f + 10.0f + 200.0f;
+
+        String expectedReceipt =
+                String.format("(==== %s ====)%n", "test bun") +
+                        String.format("= %s %s =%n", "sauce", "ketchup") +
+                        String.format("= %s %s =%n", "filling", "cutlet") +
+                        String.format("(==== %s ====)%n", "test bun") +
+                        String.format("%nPrice: %f%n", expectedPrice);
+
+        String actualReceipt = burger.getReceipt();
+
+        assertEquals(expectedReceipt, actualReceipt);
     }
 }
