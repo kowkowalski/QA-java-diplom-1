@@ -5,6 +5,9 @@
 # Maven
 target/
 
+# Allow reports folder (Jacoco coverage report)
+!reports/
+
 # Logs
 *.log
 

@@ -20,17 +20,15 @@ public class BurgerTest {
     private Bun bunMock;
 
     @Mock
-    private Ingredient ingredientMock1;
+    private Ingredient fillingIngredientMock;
 
     @Mock
-    private Ingredient ingredientMock2;
+    private Ingredient sauceIngredientMock;
 
     @Before
     public void setUp() {
         burger = new Burger();
     }
-
-
 
     @Test
     public void setBunsSavesBunInField() {
@@ -38,29 +36,23 @@ public class BurgerTest {
         assertSame(bunMock, burger.bun);
     }
 
-
-
     @Test
     public void addIngredientIncreasesIngredientsSizeByOne() {
         burger.setBuns(bunMock);
-        burger.addIngredient(ingredientMock1);
+        burger.addIngredient(fillingIngredientMock);
         assertEquals(1, burger.ingredients.size());
     }
-
-
 
     @Test
     public void removeIngredientDecreasesIngredientsSizeByOne() {
         burger.setBuns(bunMock);
-        burger.addIngredient(ingredientMock1);
-        burger.addIngredient(ingredientMock2);
+        burger.addIngredient(fillingIngredientMock);
+        burger.addIngredient(sauceIngredientMock);
 
         burger.removeIngredient(0);
 
         assertEquals(1, burger.ingredients.size());
     }
-
-
 
     @Test
     public void moveIngredientChangesIngredientOrder() {
@@ -77,41 +69,37 @@ public class BurgerTest {
         assertSame(first, burger.ingredients.get(1));
     }
 
-
-
     @Test
     public void getPriceReturnsSumOfBunAndIngredients() {
         when(bunMock.getPrice()).thenReturn(100.0f);
-        when(ingredientMock1.getPrice()).thenReturn(20.0f);
-        when(ingredientMock2.getPrice()).thenReturn(30.0f);
+        when(fillingIngredientMock.getPrice()).thenReturn(20.0f);
+        when(sauceIngredientMock.getPrice()).thenReturn(30.0f);
 
         burger.setBuns(bunMock);
-        burger.addIngredient(ingredientMock1);
-        burger.addIngredient(ingredientMock2);
+        burger.addIngredient(fillingIngredientMock);
+        burger.addIngredient(sauceIngredientMock);
 
         float expectedPrice = 2 * 100.0f + 20.0f + 30.0f;
 
         assertEquals(expectedPrice, burger.getPrice(), 0.0001f);
     }
 
-
-
     @Test
     public void getReceiptReturnsFormattedReceiptWithBunIngredientsAndPrice() {
         when(bunMock.getName()).thenReturn("test bun");
         when(bunMock.getPrice()).thenReturn(100.0f);
 
-        when(ingredientMock1.getType()).thenReturn(IngredientType.SAUCE);
-        when(ingredientMock1.getName()).thenReturn("ketchup");
-        when(ingredientMock1.getPrice()).thenReturn(10.0f);
+        when(fillingIngredientMock.getType()).thenReturn(IngredientType.SAUCE);
+        when(fillingIngredientMock.getName()).thenReturn("ketchup");
+        when(fillingIngredientMock.getPrice()).thenReturn(10.0f);
 
-        when(ingredientMock2.getType()).thenReturn(IngredientType.FILLING);
-        when(ingredientMock2.getName()).thenReturn("cutlet");
-        when(ingredientMock2.getPrice()).thenReturn(200.0f);
+        when(sauceIngredientMock.getType()).thenReturn(IngredientType.FILLING);
+        when(sauceIngredientMock.getName()).thenReturn("cutlet");
+        when(sauceIngredientMock.getPrice()).thenReturn(200.0f);
 
         burger.setBuns(bunMock);
-        burger.addIngredient(ingredientMock1);
-        burger.addIngredient(ingredientMock2);
+        burger.addIngredient(fillingIngredientMock);
+        burger.addIngredient(sauceIngredientMock);
 
         float expectedPrice = 2 * 100.0f + 10.0f + 200.0f;
 
