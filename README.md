@@ -76,7 +76,7 @@ mvn clean test
 Открыть отчёт:
 
 ```
-target/site/jacoco/index.html
+reports/jacoco/index.html
 ```
 
 Покрытие `Burger`, `Bun`, `Ingredient`, `IngredientType` — **100%**.
